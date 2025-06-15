@@ -3,10 +3,14 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    df = pd.read_csv("cuts.csv")    
+    df = pd.read_csv("cuts.csv")
     # create list of cuts
     cut_list = createCutList(df)
     print(cut_list)
+
+
+def plotCuts() -> None: ...
+
 
 def createCutList(df) -> list:
     quantity_list = list(df["quantity"])
