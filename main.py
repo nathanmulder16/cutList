@@ -7,10 +7,24 @@ def main():
     # create list of cuts
     cut_list = createCutList(df)
     print(cut_list)
+    plotCuts()
 
 
-def plotCuts() -> None: ...
-
+def plotCuts() -> None:
+    
+    data = {"Category": ["Cat A", "Cat B", "Cat C"],
+    "Data 1": [10, 20, 30],
+    "Data 2": [15, 25, 35],
+    "Data 3": [5, 10, 15]}
+    
+    data_df = pd.DataFrame(data)
+    
+    data_df.set_index("Category", inplace=True)
+    data_df.plot(kind="barh", stacked=True, figsize=(8,6))
+    plt.xlabel("Length")
+    plt.title("Cut List")
+    plt.legend()
+    plt.show()
 
 def createCutList(df) -> list:
     quantity_list = list(df["quantity"])
