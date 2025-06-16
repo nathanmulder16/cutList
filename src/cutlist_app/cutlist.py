@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+BOARD_LENGTH = 96
 
 def main():
     df = pd.read_csv("tests/cuts.csv")
@@ -9,6 +10,9 @@ def main():
     print(cut_list)
     plotCuts()
 
+
+def createBoards(cut_list) -> pd.DataFrame:
+    ...
 
 def plotCuts() -> None:
 
@@ -39,6 +43,7 @@ def createCutList(df) -> list:
         length = length_list[i]
         for _ in range(quantity):
             cut_list.append(length)
+    cut_list.sort(reverse=True)
     return cut_list
 
 
