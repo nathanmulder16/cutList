@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    df = pd.read_csv("cuts.csv")
+    df = pd.read_csv("tests/cuts.csv")
     # create list of cuts
     cut_list = createCutList(df)
     print(cut_list)
@@ -23,6 +23,7 @@ def plotCuts() -> None:
 
     data_df.set_index("Category", inplace=True)
     data_df.plot(kind="barh", stacked=True, figsize=(8, 6))
+
     plt.xlabel("Length")
     plt.title("Cut List")
     plt.legend()
