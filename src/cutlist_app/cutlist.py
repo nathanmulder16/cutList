@@ -3,16 +3,36 @@ import matplotlib.pyplot as plt
 
 BOARD_LENGTH = 96
 
+
 def main():
     df = pd.read_csv("tests/cuts.csv")
     # create list of cuts
     cut_list = createCutList(df)
     print(cut_list)
+    boards = createBoards(cut_list)
+    print(boards)
     plotCuts()
 
 
-def createBoards(cut_list) -> pd.DataFrame:
-    ...
+def createBoards(cut_list) -> list:
+    remaining_board_length = BOARD_LENGTH
+    boards = []
+    board = []
+    while len(cut_list) > 0:
+        if min(cut_list) > remaining_board_length:
+            boards.append(board)
+            board = []
+            remaining_board_length = BOARD_LENGTH
+        else:
+            for i in range(len(cut_list)):
+                if cut_list[i] <= remaining_board_length:
+                    remaining_board_length -= cut_list[i]
+                    board.append(cut_list.pop(i))
+                    break
+    if len(board) > 0:
+        boards.append(board)
+    return boards
+
 
 def plotCuts() -> None:
 
