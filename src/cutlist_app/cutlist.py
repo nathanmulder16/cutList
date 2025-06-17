@@ -37,15 +37,16 @@ def createBoards(cut_list) -> list:
 def plotCuts() -> None:
 
     data = {
-        "Category": ["Cat A", "Cat B", "Cat C"],
+        "Boards": ["Board 1", "Board 2", "Board 3"],
         "Data 1": [10, 20, 30],
         "Data 2": [15, 25, 35],
         "Data 3": [5, 10, 15],
     }
 
     data_df = pd.DataFrame(data)
+    print(data_df)
 
-    data_df.set_index("Category", inplace=True)
+    data_df.set_index("Boards", inplace=True)
     data_df.plot(kind="barh", stacked=True, figsize=(8, 6))
 
     plt.xlabel("Length")
