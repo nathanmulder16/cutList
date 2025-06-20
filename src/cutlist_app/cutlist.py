@@ -17,10 +17,23 @@ def startStreamlit(boards_df):
     col1, col2 = st.columns(2)
     with col1:
         st.header("Boards Table")
-        st.write(boards_df)
+        st.table(boards_df)
     with col2:
         st.header("Chart")
-        st.bar_chart(boards_df, x="board_id", y="length", color="cut_id", horizontal=True)
+        st.bar_chart(
+            boards_df,
+            x="board_id",
+            y="length",
+            color="cut_id",
+            horizontal=True,
+            x_label="Length (in)",
+            y_label="Board",
+            use_container_width=False,
+            width=700,
+            height=400,
+        )
+
+
 def createBoards(cut_list) -> pd.DataFrame:
     remaining_board_length = BOARD_LENGTH
     boards = []
