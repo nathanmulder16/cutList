@@ -17,9 +17,12 @@ def startStreamlit(boards_df):
     col1, col2 = st.columns(2)
     with col1:
         st.header("Boards Table")
-        st.table(boards_df)
+        # st.table(boards_df)
+        counted_columns = boards_df.groupby("length")["length"].value_counts()
+        st.table(counted_columns)
     with col2:
-        st.header("Chart")
+        st.header("Charts")
+        st.subheader("2x4")
         st.bar_chart(
             boards_df,
             x="board_id",
@@ -33,6 +36,8 @@ def startStreamlit(boards_df):
             height=400,
         )
 
+def createDisplayTable(boards_df):
+    ...
 
 def createBoards(cut_list) -> pd.DataFrame:
     remaining_board_length = BOARD_LENGTH
