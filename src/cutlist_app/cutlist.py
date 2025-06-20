@@ -17,7 +17,6 @@ def startStreamlit(boards_df):
     col1, col2 = st.columns(2)
     with col1:
         st.header("Boards Table")
-        # st.table(boards_df)
         counted_columns = boards_df.groupby("length")["length"].value_counts()
         st.table(counted_columns)
     with col2:
@@ -36,8 +35,6 @@ def startStreamlit(boards_df):
             height=400,
         )
 
-def createDisplayTable(boards_df):
-    ...
 
 def createBoards(cut_list) -> pd.DataFrame:
     remaining_board_length = BOARD_LENGTH
