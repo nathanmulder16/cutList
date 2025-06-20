@@ -9,13 +9,14 @@ def main():
     df = pd.read_csv("tests/cuts.csv")
     # create list of cuts
     cut_list = createCutList(df)
-    print(cut_list)
     boards = createBoards(cut_list)
     print(boards)
-    plotCuts()
 
 
-def createBoards(cut_list) -> list:
+#   plotCuts()
+
+
+def createBoards(cut_list) -> pd.DataFrame:
     remaining_board_length = BOARD_LENGTH
     boards = []
     board = []
@@ -32,7 +33,11 @@ def createBoards(cut_list) -> list:
                     break
     if len(board) > 0:
         boards.append(board)
-    return boards
+    boards_df = pd.DataFrame(columns=["length", "board", "cut_id"])
+    for board_id, board_list in enumerate(boards):
+        for board_len in board_list:
+            boards_df.loc[len(boards_df)] = [board_len, board_id + 1, str(board_len)]
+    return boards_df
 
 
 def plotCuts() -> None:
