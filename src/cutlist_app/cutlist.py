@@ -1,7 +1,5 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import streamlit as st
-import plotly.express as px
 
 BOARD_LENGTH = 96
 
@@ -11,13 +9,18 @@ def main():
     # create list of cuts
     cut_list = createCutList(df)
     boards_df = createBoards(cut_list)
-    plotCuts(boards_df)
-    startStreamlit()
+    startStreamlit(boards_df)
 
 
-def startStreamlit(): ...
-
-
+def startStreamlit(boards_df):
+    st.title("Cut List App")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.header("Boards Table")
+        st.write(boards_df)
+    with col2:
+        st.header("Chart")
+        st.bar_chart(boards_df, x="board_id", y="length", color="cut_id", horizontal=True)
 def createBoards(cut_list) -> pd.DataFrame:
     remaining_board_length = BOARD_LENGTH
     boards = []
@@ -40,11 +43,6 @@ def createBoards(cut_list) -> pd.DataFrame:
         for board_len in board_list:
             boards_df.loc[len(boards_df)] = [board_len, board_id + 1, str(board_len)]
     return boards_df
-
-
-def plotCuts(boards_df) -> None:
-    st.write(boards_df)
-    st.bar_chart(boards_df, x="board_id", y="length", color="cut_id", horizontal=True)
 
 
 def createCutList(df) -> list:
