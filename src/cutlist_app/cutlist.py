@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-BOARD_LENGTH = 96
+BOARD_LENGTH_TOTAL = 96
 
 
 def main():
@@ -33,14 +33,14 @@ def startStreamlit(boards_df):
 
 
 def createBoards(cut_list) -> pd.DataFrame:
-    remaining_board_length = BOARD_LENGTH
+    remaining_board_length = BOARD_LENGTH_TOTAL
     boards = []
     board = []
     while len(cut_list) > 0:
         if min(cut_list) > remaining_board_length:
             boards.append(board)
             board = []
-            remaining_board_length = BOARD_LENGTH
+            remaining_board_length = BOARD_LENGTH_TOTAL
         else:
             for i in range(len(cut_list)):
                 if cut_list[i] <= remaining_board_length:
