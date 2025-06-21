@@ -26,7 +26,7 @@ def startStreamlit(boards_df):
     # Sidebar
     st.sidebar.title("Bill of Materials")
     counted_columns = boards_df.groupby("length")["length"].value_counts()
-    st.sidebar.dataframe(counted_columns)
+    st.sidebar.table(counted_columns)
     # Charts
     with st.container(border=True):
         st.subheader("2x4")
