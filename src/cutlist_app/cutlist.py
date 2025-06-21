@@ -8,8 +8,7 @@ def main():
     df = pd.read_csv("tests/cuts.csv")
     # create list of cuts
     cut_list = createCutList(df)
-    boards_df = createBoards(cut_list)
-    startStreamlit(boards_df)
+    startStreamlit(cut_list)
 
 
 def startStreamlit(boards_df):
@@ -56,7 +55,7 @@ def createBoards(cut_list) -> pd.DataFrame:
     return boards_df
 
 
-def createCutList(df) -> list:
+def createCutList(df) -> pd.DataFrame:
     quantity_list = list(df["quantity"])
     length_list = list(df["length"])
     cut_list = []
@@ -66,6 +65,7 @@ def createCutList(df) -> list:
         for _ in range(quantity):
             cut_list.append(length)
     cut_list.sort(reverse=True)
+    cut_list = createBoards(cut_list)
     return cut_list
 
 
