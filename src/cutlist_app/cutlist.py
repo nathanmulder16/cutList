@@ -26,20 +26,22 @@ def startStreamlit(boards_df):
     # Sidebar
     st.sidebar.title("Bill of Materials")
     counted_columns = boards_df.groupby("length")["length"].value_counts()
-    st.sidebar.table(counted_columns)
-    st.subheader("2x4")
-    st.bar_chart(
-        boards_df,
-        x="board_id",
-        y="length",
-        color="cut_id",
-        horizontal=True,
-        x_label="Length (in)",
-        y_label="Board",
-        use_container_width=False,
-        width=700,
-        height=400,
-    )
+    st.sidebar.dataframe(counted_columns)
+    # Charts
+    with st.container(border=True):
+        st.subheader("2x4")
+        st.bar_chart(
+            boards_df,
+            x="board_id",
+            y="length",
+            color="cut_id",
+            horizontal=True,
+            x_label="Length (in)",
+            y_label="Board",
+            use_container_width=False,
+            width=1000,
+            height=400,
+        )
 
 
 def createBoards(cut_list) -> pd.DataFrame:
