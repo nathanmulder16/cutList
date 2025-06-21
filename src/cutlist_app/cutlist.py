@@ -3,6 +3,8 @@ import streamlit as st
 
 BOARD_LENGTH_TOTAL = 96
 
+#TODO: Create buttons to add input to a database (description, quantit, length, wxh)
+#TODO: Create multiple charts depending on wxh
 
 def main():
     df = pd.read_csv("tests/cuts.csv")
