@@ -1,6 +1,8 @@
 import pandas as pd
 import streamlit as st
+import os
 
+st.set_page_config(layout="wide", page_title="Cut List", page_icon=":material/carpenter:")
 BOARD_LENGTH_TOTAL = 96
 
 #TODO: Create buttons to add input to a database (description, quantit, length, wxh)
@@ -14,7 +16,14 @@ def main():
 
 
 def startStreamlit(boards_df):
-    st.title("Cut List App")
+    # Logo and Title
+    _ , col2, col3 = st.columns([1,1,3] )
+    with col2:
+        st.image(os.path.join(os.getcwd(), "static", "logo.png"), use_container_width=False, width=200)
+    with col3:   
+        st.title("Cut List")
+    st.divider()
+    # Sidebar
     st.sidebar.title("Bill of Materials")
     counted_columns = boards_df.groupby("length")["length"].value_counts()
     st.sidebar.table(counted_columns)
