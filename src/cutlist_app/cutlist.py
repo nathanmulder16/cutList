@@ -24,6 +24,7 @@ def startStreamlit(boards_df):
         st.title("Cut List")
     st.divider()
     # Sidebar
+    st.sidebar.toggle("Include Kerf")
     st.sidebar.title("Bill of Materials")
     counted_columns = boards_df.groupby("length")["length"].value_counts()
     st.sidebar.table(counted_columns)
