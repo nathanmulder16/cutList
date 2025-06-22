@@ -5,8 +5,9 @@ import os
 st.set_page_config(layout="wide", page_title="Cut List", page_icon=":material/carpenter:")
 BOARD_LENGTH_TOTAL = 96
 
-#TODO: Create buttons to add input to a database (description, quantit, length, wxh)
-#TODO: Create multiple charts depending on wxh
+#TODO: feat: Center "Bill of Materials in sidebar"
+#TODO: feat: Create buttons to add input to a database (description, quantit, length, wxh)
+#TODO: feat: Create multiple charts depending on wxh
 
 def main():
     df = pd.read_csv("tests/cuts.csv")
@@ -17,7 +18,7 @@ def main():
 
 def startStreamlit(boards_df):
     # Logo and Title
-    _ , col2, col3 = st.columns([1,1,3] )
+    _ , col2, col3 = st.columns([1,1,3])
     with col2:
         st.image(os.path.join(os.getcwd(), "static", "logo.png"), use_container_width=False, width=200)
     with col3:   
@@ -25,7 +26,9 @@ def startStreamlit(boards_df):
     st.divider()
     # Sidebar
     st.sidebar.toggle("Include Kerf")
-    st.sidebar.title("Bill of Materials")
+    _, col5, _ = st.sidebar.columns([0.1,0.8,0.1])
+    with col5:
+        st.title("Bill of Materials")
     counted_columns = boards_df.groupby("length")["length"].value_counts()
     st.sidebar.table(counted_columns)
     # Charts
