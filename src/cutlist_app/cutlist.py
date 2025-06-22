@@ -26,6 +26,13 @@ def startStreamlit(boards_df):
     with st.sidebar:
         st.toggle("Include Kerf")
         st.title("Bill of Materials")
+        # Inputs
+        description = st.text_input("Description:")
+        quantity_input = st.number_input("Qty:")
+        length_input = st.number_input("Length:")
+        wxh_input = st.number_input("Width x Height:")
+
+        # Display Table
         counted_columns = boards_df.groupby("length")["length"].value_counts()
         st.dataframe(counted_columns)
     # Charts
