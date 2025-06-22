@@ -25,12 +25,13 @@ def startStreamlit(boards_df):
         st.title("Cut List")
     st.divider()
     # Sidebar
-    st.sidebar.toggle("Include Kerf")
-    _, col5, _ = st.sidebar.columns([0.1,0.8,0.1])
-    with col5:
-        st.title("Bill of Materials")
-    counted_columns = boards_df.groupby("length")["length"].value_counts()
-    st.sidebar.table(counted_columns)
+    with st.sidebar:
+        st.toggle("Include Kerf")
+        _, col5, _ = st.columns([0.1,0.8,0.1])
+        with col5:
+            st.title("Bill of Materials")
+        counted_columns = boards_df.groupby("length")["length"].value_counts()
+        st.table(counted_columns)
     # Charts
     with st.container(border=True):
         st.subheader("2x4")
