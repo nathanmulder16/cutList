@@ -27,16 +27,17 @@ def startStreamlit(boards_df):
         st.toggle("Include Kerf")
         st.title("Bill of Materials")
         # Inputs
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
         with col1:
             description_input = st.text_input("Description:")
+            wxh_input = st.selectbox("Width x Height:", ["1x2", "1x4","2x2", "2x4", "2x6", "2x8", "2x12", "4x4"])
         with col2:
             quantity_input = st.number_input("Qty:", min_value=1, max_value=1000, value=1, step=1)
-        with col3:
             length_input = st.number_input("Length (in):")
-        with col4:
-            wxh_input = st.selectbox("Width x Height:", ["1x2", "1x4","2x2", "2x4", "2x6", "2x8", "2x12", "4x4"])
-        st.button("Add")
+        with col3:
+            for _ in range(7):
+                st.write("")
+            st.button("Add")
         # Display Table
         counted_columns = boards_df.groupby("length")["length"].value_counts()
         st.dataframe(counted_columns)
