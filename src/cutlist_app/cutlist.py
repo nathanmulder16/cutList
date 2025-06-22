@@ -24,23 +24,28 @@ def startStreamlit(boards_df):
     st.divider()
     # Sidebar
     with st.sidebar:
-        st.toggle("Include Kerf")
-        st.title("Bill of Materials")
-        # Inputs
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            description_input = st.text_input("Description:")
-            wxh_input = st.selectbox("Width x Height:", ["1x2", "1x4","2x2", "2x4", "2x6", "2x8", "2x12", "4x4"])
-        with col2:
-            quantity_input = st.number_input("Qty:", min_value=1, max_value=1000, value=1, step=1)
-            length_input = st.number_input("Length (in):")
-        with col3:
-            for _ in range(7):
-                st.write("")
-            st.button("Add")
-        # Display Table
-        counted_columns = boards_df.groupby("length")["length"].value_counts()
-        st.dataframe(counted_columns)
+        with st.container(border=True):
+            st.title("Settings")
+            st.toggle("Include Kerf")
+            max_length = st.number_input("Max Length (in):", min_value=12, max_value=144, value=96, step=12)
+        with st.container(border=True):
+            st.title("Bill of Materials")
+            # Inputs
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                description_input = st.text_input("Description:")
+                wxh_input = st.selectbox("Width x Height:", ["1x2", "1x4","2x2", "2x4", "2x6", "2x8", "2x12", "4x4"])
+            with col2:
+                quantity_input = st.number_input("Qty:", min_value=1, max_value=1000, value=1, step=1)
+                length_input = st.number_input("Length (in):")
+            with col3:
+                for _ in range(7):
+                    st.write("")
+                st.button("Add")
+            # Display Table
+            counted_columns = boards_df.groupby("length")["length"].value_counts()
+            st.dataframe(counted_columns)
+        st.button("Restart Cut List")
     # Charts
     # create number of charts based on differing WxH
     for _ in range(2):
