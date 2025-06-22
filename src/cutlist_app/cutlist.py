@@ -31,17 +31,19 @@ def startStreamlit(boards_df):
         with st.container(border=True):
             st.title("Bill of Materials")
             # Inputs
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                description_input = st.text_input("Description:")
-                wxh_input = st.selectbox("Width x Height:", ["1x2", "1x4","2x2", "2x4", "2x6", "2x8", "2x12", "4x4"])
-            with col2:
-                quantity_input = st.number_input("Qty:", min_value=1, max_value=1000, value=1, step=1)
-                length_input = st.number_input("Length (in):")
-            with col3:
-                for _ in range(7):
-                    st.write("")
-                st.button("Add")
+            with st.form(key="user_input_form", clear_on_submit=True):
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    description_input = st.text_input("Description:")
+                    wxh_input = st.selectbox("Width x Height:", ["1x2", "1x4","2x2", "2x4", "2x6", "2x8", "2x12", "4x4"])
+                with col2:
+                    quantity_input = st.number_input("Qty:", min_value=1, max_value=1000, value=1, step=1)
+                    length_input = st.number_input("Length (in):")
+                with col3:
+                    for _ in range(7):
+                        st.write("")
+                    st.form_submit_button("Add")
+                    # st.form_submit_button("Add", on_click=addRowToDataframe(existing_df, user_input_df))
             # Display Table
             counted_columns = boards_df.groupby("length")["length"].value_counts()
             st.dataframe(counted_columns)
@@ -64,6 +66,10 @@ def startStreamlit(boards_df):
                 height=400,
             )
 
+def addRowToDataframe(existing_df, user_input_df):
+    existing_df.add_rows(user_input_df)
+    
+    
 def createBoards(cut_list) -> pd.DataFrame:
     remaining_board_length = BOARD_LENGTH_TOTAL
     boards = []
