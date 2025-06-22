@@ -33,34 +33,22 @@ def startStreamlit(boards_df):
         counted_columns = boards_df.groupby("length")["length"].value_counts()
         st.dataframe(counted_columns)
     # Charts
-    with st.container(border=True):
-        st.subheader("2x4")
-        st.bar_chart(
-            boards_df,
-            x="board_id",
-            y="length",
-            color="cut_id",
-            horizontal=True,
-            x_label="Length (in)",
-            y_label="Board",
-            use_container_width=False,
-            width=1000,
-            height=400,
-        )
-    with st.container(border=True):
-        st.subheader("4x4")
-        st.bar_chart(
-            boards_df,
-            x="board_id",
-            y="length",
-            color="cut_id",
-            horizontal=True,
-            x_label="Length (in)",
-            y_label="Board",
-            use_container_width=False,
-            width=1000,
-            height=400,
-        )
+    # create number of charts based on differing WxH
+    for _ in range(2):
+        with st.container(border=True):
+            st.subheader("2x4")
+            st.bar_chart(
+                boards_df,
+                x="board_id",
+                y="length",
+                color="cut_id",
+                horizontal=True,
+                x_label="Length (in)",
+                y_label="Board",
+                use_container_width=False,
+                width=1000,
+                height=400,
+            )
 
 def createBoards(cut_list) -> pd.DataFrame:
     remaining_board_length = BOARD_LENGTH_TOTAL
