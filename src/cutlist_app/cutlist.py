@@ -31,7 +31,7 @@ def startStreamlit(boards_df):
         with col5:
             st.title("Bill of Materials")
         counted_columns = boards_df.groupby("length")["length"].value_counts()
-        st.table(counted_columns)
+        st.dataframe(counted_columns)
     # Charts
     with st.container(border=True):
         st.subheader("2x4")
