@@ -11,10 +11,11 @@ def main():
     df = pd.read_csv("tests/cuts.csv")
     # create list of cuts
     cut_list = createCutList(df)
-    startStreamlit(cut_list)
+    blank_cut_list_df = pd.DataFrame(columns=["description", "quantity", "length", "wxh"])
+    startStreamlit(cut_list, blank_cut_list_df)
 
 
-def startStreamlit(boards_df):
+def startStreamlit(boards_df, blank_cut_list_df):
     # Logo and Title
     _ , col2, col3 = st.columns([1,1,3])
     with col2:
@@ -24,10 +25,16 @@ def startStreamlit(boards_df):
     st.divider()
     # Sidebar
     with st.sidebar:
+        #TODO: add functionality to uploader
+        st.file_uploader("Upload")
         with st.container(border=True):
             st.title("Settings")
+            #TODO: Make kerf measurement work
             st.toggle("Include Kerf")
+
+            #TODO: Make max length transfer to BOARD_LENGTH
             max_length = st.number_input("Max Length (in):", min_value=12, max_value=144, value=96, step=12)
+
         with st.container(border=True):
             st.title("Bill of Materials")
             # Inputs
@@ -39,15 +46,33 @@ def startStreamlit(boards_df):
                 with col2:
                     quantity_input = st.number_input("Qty:", min_value=1, max_value=1000, value=1, step=1)
                     length_input = st.number_input("Length (in):")
+
+                user_input_df = pd.DataFrame({
+                    "description": [description_input],
+                    "quantity": [quantity_input],
+                    "length": [length_input],
+                    "wxh": [wxh_input]
+                })
+                st.dataframe(user_input_df, hide_index=True)
+
+                
+
                 with col3:
                     for _ in range(7):
                         st.write("")
                     st.form_submit_button("Add")
-                    # st.form_submit_button("Add", on_click=addRowToDataframe(existing_df, user_input_df))
+                    # st.form_submit_button("Add", on_click=addRowToDataframe(blank_cut_list_df, user_input_df))
             # Display Table
             counted_columns = boards_df.groupby("length")["length"].value_counts()
             st.dataframe(counted_columns)
+            st.dataframe(blank_cut_list_df)
+        #TODO: make this restart button reset everything
         st.button("Restart Cut List")
+
+        #TODO: create button to export to save for later
+    
+    
+    
     # Charts
     # create number of charts based on differing WxH
     for _ in range(2):
@@ -66,8 +91,12 @@ def startStreamlit(boards_df):
                 height=400,
             )
 
-def addRowToDataframe(existing_df, user_input_df):
-    existing_df.add_rows(user_input_df)
+def addRowToDataframe(orig_df, user_input_df):
+    if orig_df.empty:
+        return user_input_df
+    else:
+        orig_df = pd.concat([orig_df, user_input_df], ignore_index=True)
+    return orig_df
     
     
 def createBoards(cut_list) -> pd.DataFrame:
