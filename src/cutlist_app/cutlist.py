@@ -28,6 +28,7 @@ def startStreamlit(boards_df, blank_cut_list_df):
         st.file_uploader("Upload")
         with st.container(border=True):
             st.title("Settings")
+            #TODO: make toggle and length into form
             #TODO: Make kerf measurement work
             st.toggle("Include Kerf")
 
