@@ -52,16 +52,15 @@ def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
     return cut_list
 
+
 if "max_length" not in st.session_state:
-    MAX_BOARD_LENGTH = 96
-    st.session_state.max_length = MAX_BOARD_LENGTH
-else:
-    MAX_BOARD_LENGTH = st.session_state.max_length
+    st.session_state.max_length = 96
+    st.session_state.old_value = st.session_state.max_length
 
 
 df = pd.read_csv("tests/cuts.csv")
 # create list of cuts
-cut_list = createCutList(df, MAX_BOARD_LENGTH)
+cut_list = createCutList(df, st.session_state.max_length)
 blank_cut_list_df = pd.DataFrame(columns=["description", "quantity", "length", "wxh"])
 
 
@@ -90,14 +89,20 @@ with st.sidebar:
             with col3:
                 # TODO: make submit button work
                 update_button = st.form_submit_button("Update")
-            # TODO: Make max length transfer to BOARD_LENGTH
             max_length_input = st.number_input(
-                "Max Length (in):", min_value=12, max_value=144, value=96, step=12, key="max_length"
+                "Max Length (in):",
+                min_value=12,
+                max_value=144,
+                value=96,
+                step=12,
+                key="max_length",
             )
             if update_button:
-                if MAX_BOARD_LENGTH != max_length_input:
-                    st.success(f"Max length updated from {MAX_BOARD_LENGTH} to {max_length_input}.")
-                    MAX_BOARD_LENGTH = max_length_input
+                if st.session_state.max_length != st.session_state.old_value:
+                    st.success(
+                        f"Max length updated from {st.session_state.old_value} to {max_length_input}."
+                    )
+                    st.session_state.old_value = st.session_state.max_length
     with st.container(border=True):
         st.title("Bill of Materials")
         # Inputs
