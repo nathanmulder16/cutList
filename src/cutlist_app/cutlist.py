@@ -34,6 +34,7 @@ def startStreamlit(boards_df, blank_cut_list_df):
                     #TODO: Make kerf measurement work
                     st.toggle("Include Kerf")
                 with col3:
+                    #TODO: make submit button work
                     st.form_submit_button("Update")
                 #TODO: Make max length transfer to BOARD_LENGTH
                 max_length = st.number_input("Max Length (in):", min_value=12, max_value=144, value=96, step=12)
