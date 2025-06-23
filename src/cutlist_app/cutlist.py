@@ -28,13 +28,15 @@ def startStreamlit(boards_df, blank_cut_list_df):
         st.file_uploader("Upload")
         with st.container(border=True):
             st.title("Settings")
-            #TODO: make toggle and length into form
-            #TODO: Make kerf measurement work
-            st.toggle("Include Kerf")
-
-            #TODO: Make max length transfer to BOARD_LENGTH
-            max_length = st.number_input("Max Length (in):", min_value=12, max_value=144, value=96, step=12)
-
+            with st.form("settings_form"):
+                col1, _, col3= st.columns([0.4, 0.35, 0.25])
+                with col1:
+                    #TODO: Make kerf measurement work
+                    st.toggle("Include Kerf")
+                with col3:
+                    st.form_submit_button("Update")
+                #TODO: Make max length transfer to BOARD_LENGTH
+                max_length = st.number_input("Max Length (in):", min_value=12, max_value=144, value=96, step=12)
         with st.container(border=True):
             st.title("Bill of Materials")
             # Inputs
