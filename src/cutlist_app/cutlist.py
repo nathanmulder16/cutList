@@ -87,7 +87,6 @@ with st.sidebar:
                 # TODO: Make kerf measurement work
                 kerf_toggle = st.toggle("Include Kerf")
             with col3:
-                # TODO: make submit button work
                 update_button = st.form_submit_button("Update")
             max_length_input = st.number_input(
                 "Max Length (in):",
@@ -97,6 +96,7 @@ with st.sidebar:
                 step=12,
                 key="max_length",
             )
+            #TODO: add check to verify new length isn't shorter than longest piece
             if update_button:
                 if st.session_state.max_length != st.session_state.old_value:
                     st.success(
