@@ -5,7 +5,6 @@ import os
 st.set_page_config(
     layout="wide", page_title="Cut List", page_icon=":material/carpenter:"
 )
-BOARD_LENGTH_TOTAL = 96
 
 
 def addRowToDataframe(orig_df, user_input_df):
@@ -16,15 +15,15 @@ def addRowToDataframe(orig_df, user_input_df):
     return orig_df
 
 
-def createBoards(cut_list) -> pd.DataFrame:
-    remaining_board_length = BOARD_LENGTH_TOTAL
+def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
+    remaining_board_length = MAX_BOARD_LENGTH
     boards = []
     board = []
     while len(cut_list) > 0:
         if min(cut_list) > remaining_board_length:
             boards.append(board)
             board = []
-            remaining_board_length = BOARD_LENGTH_TOTAL
+            remaining_board_length = MAX_BOARD_LENGTH
         else:
             for i in range(len(cut_list)):
                 if cut_list[i] <= remaining_board_length:
@@ -40,7 +39,7 @@ def createBoards(cut_list) -> pd.DataFrame:
     return boards_df
 
 
-def createCutList(df) -> pd.DataFrame:
+def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     quantity_list = list(df["quantity"])
     length_list = list(df["length"])
     cut_list = []
@@ -50,13 +49,19 @@ def createCutList(df) -> pd.DataFrame:
         for _ in range(quantity):
             cut_list.append(length)
     cut_list.sort(reverse=True)
-    cut_list = createBoards(cut_list)
+    cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
     return cut_list
+
+if "max_length" not in st.session_state:
+    MAX_BOARD_LENGTH = 96
+    st.session_state.max_length = MAX_BOARD_LENGTH
+else:
+    MAX_BOARD_LENGTH = st.session_state.max_length
 
 
 df = pd.read_csv("tests/cuts.csv")
 # create list of cuts
-cut_list = createCutList(df)
+cut_list = createCutList(df, MAX_BOARD_LENGTH)
 blank_cut_list_df = pd.DataFrame(columns=["description", "quantity", "length", "wxh"])
 
 
@@ -81,14 +86,18 @@ with st.sidebar:
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
             with col1:
                 # TODO: Make kerf measurement work
-                st.toggle("Include Kerf")
+                kerf_toggle = st.toggle("Include Kerf")
             with col3:
                 # TODO: make submit button work
-                st.form_submit_button("Update")
+                update_button = st.form_submit_button("Update")
             # TODO: Make max length transfer to BOARD_LENGTH
-            max_length = st.number_input(
-                "Max Length (in):", min_value=12, max_value=144, value=96, step=12
+            max_length_input = st.number_input(
+                "Max Length (in):", min_value=12, max_value=144, value=96, step=12, key="max_length"
             )
+            if update_button:
+                if MAX_BOARD_LENGTH != max_length_input:
+                    st.success(f"Max length updated from {MAX_BOARD_LENGTH} to {max_length_input}.")
+                    MAX_BOARD_LENGTH = max_length_input
     with st.container(border=True):
         st.title("Bill of Materials")
         # Inputs
