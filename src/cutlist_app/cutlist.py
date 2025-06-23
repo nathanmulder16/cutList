@@ -5,7 +5,6 @@ import os
 st.set_page_config(layout="wide", page_title="Cut List", page_icon=":material/carpenter:")
 BOARD_LENGTH_TOTAL = 96
 
-#TODO: feat: Create buttons to add input to a database (description, quantit, length, wxh)
 
 def main():
     df = pd.read_csv("tests/cuts.csv")
