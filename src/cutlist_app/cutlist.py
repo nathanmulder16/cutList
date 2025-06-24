@@ -82,8 +82,10 @@ with col3:
 st.divider()
 # Sidebar
 with st.sidebar:
-    # TODO: add functionality to uploader
-    st.file_uploader("Upload")
+    if "pieces" not in st.session_state:
+        uploaded_file = st.file_uploader("Upload", type="csv")
+        if uploaded_file is not None:
+            st.session_state.pieces = pd.read_csv(uploaded_file)
     with st.container(border=True):
         st.title("Settings")
         with st.form("settings_form"):
