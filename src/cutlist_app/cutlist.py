@@ -16,9 +16,10 @@ def addRowToDataframe(user_input):
         )
     st.success(f"Added {user_input["Description"][0]}")
 
-#TODO: add function to remove a row from table based on description
-def removeRowFromDataframe():
-    ...
+
+# TODO: add function to remove a row from table based on description
+def removeRowFromDataframe(): ...
+
 
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
     remaining_board_length = MAX_BOARD_LENGTH
@@ -121,7 +122,12 @@ with st.sidebar:
                 quantity_input = st.number_input(
                     "Qty:", min_value=1, max_value=1000, value=None, step=1
                 )
-                length_input = st.number_input("Length (in):", min_value=0.016, max_value=float(st.session_state.max_length), value=None)
+                length_input = st.number_input(
+                    "Length (in):",
+                    min_value=0.016,
+                    max_value=float(st.session_state.max_length),
+                    value=None,
+                )
             with col3:
                 for _ in range(7):
                     st.write("")
@@ -147,26 +153,19 @@ with st.sidebar:
 
 
 # Charts
-#TODO: create number of charts based on differing WxH
 if "pieces" in st.session_state:
     cut_list = createCutList(st.session_state.pieces, st.session_state.max_length)
-
-    st.divider()
-    st.write("current session_state")
-    st.dataframe(st.session_state.pieces)
-    uniqWXH = st.session_state.pieces["W x H"].unique()
-    st.write(uniqWXH)
-    st.write(st.session_state.pieces[st.session_state.pieces["W x H"] == uniqWXH[0]])
-    st.divider()
-    st.write("current cut_list")
-    st.dataframe(cut_list)
-
-
     for each_wxh in st.session_state.pieces["W x H"].unique():
         with st.container(border=True):
+            relevant_pieces_df = st.session_state.pieces[
+                st.session_state.pieces["W x H"] == each_wxh
+            ]
+            cut_list_per_wxh = createCutList(
+                relevant_pieces_df, st.session_state.max_length
+            )
             st.subheader(each_wxh)
             st.bar_chart(
-                cut_list,
+                cut_list_per_wxh,
                 x="board_id",
                 y="length",
                 color="cut_id",
@@ -179,6 +178,6 @@ if "pieces" in st.session_state:
             )
 
 else:
-    _, col, _ = st.columns([2,1,2])
+    _, col, _ = st.columns([2, 1, 2])
     with col:
         st.subheader("Create a BOM")
