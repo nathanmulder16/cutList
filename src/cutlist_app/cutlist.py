@@ -154,7 +154,6 @@ with st.sidebar:
 
 # Charts
 if "pieces" in st.session_state:
-    cut_list = createCutList(st.session_state.pieces, st.session_state.max_length)
     for each_wxh in st.session_state.pieces["W x H"].unique():
         with st.container(border=True):
             relevant_pieces_df = st.session_state.pieces[
