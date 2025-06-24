@@ -7,12 +7,13 @@ st.set_page_config(
 )
 
 
-def addRowToDataframe(orig_df, user_input_df):
-    if orig_df.empty:
-        return user_input_df
+def addRowToDataframe(user_input):
+    if "pieces" not in st.session_state:
+        st.session_state.pieces = user_input
     else:
-        orig_df = pd.concat([orig_df, user_input_df], ignore_index=True)
-    return orig_df
+        st.session_state.pieces = pd.concat(
+            [st.session_state.pieces, user_input], ignore_index=True
+        )
 
 
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
@@ -96,7 +97,7 @@ with st.sidebar:
                 step=12,
                 key="max_length",
             )
-            #TODO: add check to verify new length isn't shorter than longest piece
+            # TODO: add check to verify new length isn't shorter than longest piece
             if update_button:
                 if st.session_state.max_length != st.session_state.old_value:
                     st.success(
@@ -119,26 +120,24 @@ with st.sidebar:
                     "Qty:", min_value=1, max_value=1000, value=1, step=1
                 )
                 length_input = st.number_input("Length (in):")
-
-            user_input_df = pd.DataFrame(
-                {
-                    "description": [description_input],
-                    "quantity": [quantity_input],
-                    "length": [length_input],
-                    "wxh": [wxh_input],
-                }
-            )
-            st.dataframe(user_input_df, hide_index=True)
-
             with col3:
                 for _ in range(7):
                     st.write("")
-                st.form_submit_button("Add")
-                # st.form_submit_button("Add", on_click=addRowToDataframe(blank_cut_list_df, user_input_df))
+                bom_add_button = st.form_submit_button("Add")
+            if bom_add_button:
+                user_input = pd.DataFrame(
+                    {
+                        "description": [description_input],
+                        "quantity": [quantity_input],
+                        "length": [length_input],
+                        "wxh": [wxh_input],
+                    }
+                )
+                addRowToDataframe(user_input)
+                if "pieces" in st.session_state:
+                    st.dataframe(st.session_state.pieces, hide_index=True)
         # Display Table
         counted_columns = cut_list.groupby("length")["length"].value_counts()
-        st.dataframe(counted_columns)
-        st.dataframe(blank_cut_list_df)
     # TODO: make this restart button reset everything
     st.button("Restart Cut List")
 
