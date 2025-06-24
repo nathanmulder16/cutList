@@ -66,7 +66,6 @@ if "max_length" not in st.session_state:
 df = pd.read_csv("tests/cuts.csv")
 # create list of cuts
 cut_list = createCutList(df, st.session_state.max_length)
-blank_cut_list_df = pd.DataFrame(columns=["description", "quantity", "length", "wxh"])
 
 
 # Logo and Title
@@ -97,7 +96,6 @@ with st.sidebar:
                 "Max Length (in):",
                 min_value=12,
                 max_value=144,
-                value=96,
                 step=12,
                 key="max_length",
             )
