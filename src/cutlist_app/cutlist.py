@@ -151,9 +151,20 @@ with st.sidebar:
 if "pieces" in st.session_state:
     cut_list = createCutList(st.session_state.pieces, st.session_state.max_length)
 
-    for _ in range(2):
+    st.divider()
+    st.write("current session_state")
+    st.dataframe(st.session_state.pieces)
+    uniqWXH = st.session_state.pieces["W x H"].unique()
+    st.write(uniqWXH)
+    st.write(st.session_state.pieces[st.session_state.pieces["W x H"] == uniqWXH[0]])
+    st.divider()
+    st.write("current cut_list")
+    st.dataframe(cut_list)
+
+
+    for each_wxh in st.session_state.pieces["W x H"].unique():
         with st.container(border=True):
-            st.subheader("2x4")
+            st.subheader(each_wxh)
             st.bar_chart(
                 cut_list,
                 x="board_id",
