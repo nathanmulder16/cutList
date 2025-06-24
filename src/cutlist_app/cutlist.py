@@ -121,15 +121,14 @@ with st.sidebar:
                 )
             with col2:
                 quantity_input = st.number_input(
-                    "Qty:", min_value=1, max_value=1000, value=1, step=1
+                    "Qty:", min_value=1, max_value=1000, value=None, step=1
                 )
-                #TODO: add restriction to have length greater than 0
                 length_input = st.number_input("Length (in):", min_value=0.016, max_value=float(st.session_state.max_length), value=None)
             with col3:
                 for _ in range(7):
                     st.write("")
                 bom_add_button = st.form_submit_button("Add")
-            if bom_add_button:
+            if bom_add_button and length_input and description_input and quantity_input:
                 user_input = pd.DataFrame(
                     {
                         "Description": [description_input],
@@ -139,6 +138,8 @@ with st.sidebar:
                     }
                 )
                 addRowToDataframe(user_input)
+            else:
+                st.warning("Please fill in all fields.")
             if "pieces" in st.session_state:
                 st.dataframe(st.session_state.pieces, hide_index=True)
     # TODO: make this restart button reset everything
