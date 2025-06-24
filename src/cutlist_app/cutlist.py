@@ -45,8 +45,8 @@ def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
 
 
 def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
-    quantity_list = list(df["quantity"])
-    length_list = list(df["length"])
+    quantity_list = list(df["Quantity"])
+    length_list = list(df["Length"])
     cut_list = []
     for i in range(len(quantity_list)):
         quantity = quantity_list[i]
@@ -65,7 +65,7 @@ if "max_length" not in st.session_state:
 
 df = pd.read_csv("tests/cuts.csv")
 # create list of cuts
-cut_list = createCutList(df, st.session_state.max_length)
+# cut_list = createCutList(df, st.session_state.max_length)
 
 
 # Logo and Title
@@ -148,18 +148,26 @@ with st.sidebar:
 
 # Charts
 #TODO: create number of charts based on differing WxH
-for _ in range(2):
-    with st.container(border=True):
-        st.subheader("2x4")
-        st.bar_chart(
-            cut_list,
-            x="board_id",
-            y="length",
-            color="cut_id",
-            horizontal=True,
-            x_label="Length (in)",
-            y_label="Board",
-            use_container_width=False,
-            width=1000,
-            height=400,
-        )
+if "pieces" in st.session_state:
+    cut_list = createCutList(st.session_state.pieces, st.session_state.max_length)
+
+    for _ in range(2):
+        with st.container(border=True):
+            st.subheader("2x4")
+            st.bar_chart(
+                cut_list,
+                x="board_id",
+                y="length",
+                color="cut_id",
+                horizontal=True,
+                x_label="Length (in)",
+                y_label="Board",
+                use_container_width=False,
+                width=1000,
+                height=400,
+            )
+
+else:
+    _, col, _ = st.columns([2,1,2])
+    with col:
+        st.subheader("Create a BOM")
