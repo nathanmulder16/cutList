@@ -127,17 +127,15 @@ with st.sidebar:
             if bom_add_button:
                 user_input = pd.DataFrame(
                     {
-                        "description": [description_input],
-                        "quantity": [quantity_input],
-                        "length": [length_input],
-                        "wxh": [wxh_input],
+                        "Description": [description_input],
+                        "Quantity": [quantity_input],
+                        "Length": [length_input],
+                        "W x H": [wxh_input],
                     }
                 )
                 addRowToDataframe(user_input)
                 if "pieces" in st.session_state:
                     st.dataframe(st.session_state.pieces, hide_index=True)
-        # Display Table
-        counted_columns = cut_list.groupby("length")["length"].value_counts()
     # TODO: make this restart button reset everything
     st.button("Restart Cut List")
 
