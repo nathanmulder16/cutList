@@ -14,7 +14,11 @@ def addRowToDataframe(user_input):
         st.session_state.pieces = pd.concat(
             [st.session_state.pieces, user_input], ignore_index=True
         )
+    st.success(f"Added {user_input["Description"][0]}")
 
+#TODO: add function to remove a row from table based on description
+def removeRowFromDataframe():
+    ...
 
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
     remaining_board_length = MAX_BOARD_LENGTH
@@ -119,7 +123,8 @@ with st.sidebar:
                 quantity_input = st.number_input(
                     "Qty:", min_value=1, max_value=1000, value=1, step=1
                 )
-                length_input = st.number_input("Length (in):")
+                #TODO: add restriction to have length greater than 0
+                length_input = st.number_input("Length (in):", min_value=0.016, max_value=float(st.session_state.max_length), value=None)
             with col3:
                 for _ in range(7):
                     st.write("")
@@ -134,8 +139,8 @@ with st.sidebar:
                     }
                 )
                 addRowToDataframe(user_input)
-                if "pieces" in st.session_state:
-                    st.dataframe(st.session_state.pieces, hide_index=True)
+            if "pieces" in st.session_state:
+                st.dataframe(st.session_state.pieces, hide_index=True)
     # TODO: make this restart button reset everything
     st.button("Restart Cut List")
 
