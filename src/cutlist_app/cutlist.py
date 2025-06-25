@@ -21,6 +21,10 @@ def addRowToDataframe(user_input):
 def removeRowFromDataframe(): ...
 
 
+def reset_button_click():
+    del st.session_state.pieces
+
+
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
     remaining_board_length = MAX_BOARD_LENGTH
     boards = []
@@ -148,8 +152,7 @@ with st.sidebar:
                 st.warning("Please fill in all fields.")
             if "pieces" in st.session_state:
                 st.dataframe(st.session_state.pieces, hide_index=True)
-    # TODO: make this restart button reset everything
-    st.button("Restart Cut List")
+    reset_button = st.button("Restart Cut List", on_click=reset_button_click)
 
     # TODO: create button to export to save for later
 
