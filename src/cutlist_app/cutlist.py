@@ -22,9 +22,11 @@ def removeRowFromDataframe(): ...
 
 
 def reset_button_click():
-    if "pieces" in st.session_state:
-        del st.session_state.pieces
+    del st.session_state.pieces
 
+@st.cache_data
+def convert_df(df):
+    return df.to_csv(index=False).encode("utf-8")
 
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
     remaining_board_length = MAX_BOARD_LENGTH
@@ -148,10 +150,11 @@ with st.sidebar:
                 st.warning("Please fill in all fields.")
             if "pieces" in st.session_state:
                 st.dataframe(st.session_state.pieces, hide_index=True)
-    #TODO: fix: reset button won't clear displayed dataframe on reset when only adding csv
-    reset_button = st.button("Restart Cut List", on_click=reset_button_click)
-
-    # TODO: create button to export to save for later
+    if "pieces" in st.session_state:
+        #TODO: fix: reset button won't clear displayed dataframe on reset when only adding csv
+        reset_button = st.button("Restart Cut List", on_click=reset_button_click)
+        csv = convert_df(st.session_state.pieces)
+        st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
 
 
 # Charts
