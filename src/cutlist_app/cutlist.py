@@ -22,7 +22,8 @@ def removeRowFromDataframe(): ...
 
 
 def reset_button_click():
-    del st.session_state.pieces
+    if "pieces" in st.session_state:
+        del st.session_state.pieces
 
 
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
