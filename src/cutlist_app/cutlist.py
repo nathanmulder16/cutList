@@ -68,11 +68,6 @@ if "max_length" not in st.session_state:
     st.session_state.old_value = st.session_state.max_length
 
 
-df = pd.read_csv("tests/cuts.csv")
-# create list of cuts
-# cut_list = createCutList(df, st.session_state.max_length)
-
-
 # Logo and Title
 _, col2, col3 = st.columns([1, 1, 3])
 with col2:
@@ -152,6 +147,7 @@ with st.sidebar:
                 st.warning("Please fill in all fields.")
             if "pieces" in st.session_state:
                 st.dataframe(st.session_state.pieces, hide_index=True)
+    #TODO: fix: reset button won't clear displayed dataframe on reset when only adding csv
     reset_button = st.button("Restart Cut List", on_click=reset_button_click)
 
     # TODO: create button to export to save for later
