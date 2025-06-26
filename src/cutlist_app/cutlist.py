@@ -7,6 +7,10 @@ st.set_page_config(
 )
 
 
+def hideUploader():
+    st.session_state.hide_uploader = True
+
+
 def addRowToDataframe(user_input):
     if "pieces" not in st.session_state:
         st.session_state.pieces = user_input
@@ -23,10 +27,13 @@ def removeRowFromDataframe(): ...
 
 def reset_button_click():
     del st.session_state.pieces
+    del st.session_state.hide_uploader
+
 
 @st.cache_data
 def convert_df(df):
     return df.to_csv(index=False).encode("utf-8")
+
 
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
     remaining_board_length = MAX_BOARD_LENGTH
@@ -84,10 +91,11 @@ with col3:
 st.divider()
 # Sidebar
 with st.sidebar:
-    if "pieces" not in st.session_state:
-        uploaded_file = st.file_uploader("Upload", type="csv")
-        if uploaded_file is not None:
+    if "hide_uploader" not in st.session_state:
+        uploaded_file = st.file_uploader("Upload", type="csv", key="file-uploaded")
+        if uploaded_file is not None and "reset-btn" not in st.session_state:
             st.session_state.pieces = pd.read_csv(uploaded_file)
+            st.session_state.hide_uploader = True
     with st.container(border=True):
         st.title("Settings")
         with st.form("settings_form"):
@@ -135,7 +143,7 @@ with st.sidebar:
             with col3:
                 for _ in range(7):
                     st.write("")
-                bom_add_button = st.form_submit_button("Add")
+                bom_add_button = st.form_submit_button("Add", on_click=hideUploader)
             if bom_add_button and length_input and description_input and quantity_input:
                 user_input = pd.DataFrame(
                     {
@@ -148,11 +156,13 @@ with st.sidebar:
                 addRowToDataframe(user_input)
             else:
                 st.warning("Please fill in all fields.")
-            if "pieces" in st.session_state:
-                st.dataframe(st.session_state.pieces, hide_index=True)
+        if "pieces" in st.session_state:
+            st.dataframe(st.session_state.pieces, hide_index=True)
     if "pieces" in st.session_state:
-        # [ ]: fix: reset button won't clear displayed dataframe on reset when only adding csv
-        reset_button = st.button("Restart Cut List", on_click=reset_button_click)
+        # [x]: fix: reset button won't clear displayed dataframe on reset when only adding csv
+        reset_button = st.button(
+            "Restart Cut List", on_click=reset_button_click, key="reset-btn"
+        )
         csv = convert_df(st.session_state.pieces)
         st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
 
