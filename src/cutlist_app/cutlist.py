@@ -15,14 +15,16 @@ def addRowToDataframe(user_input):
             [st.session_state.pieces, user_input], ignore_index=True
         )
     st.success(f"Added {user_input["Description"][0]}")
+    st.session_state.hide_uploader = True
 
 
-# TODO: add function to remove a row from table based on description
+# [ ]: add function to remove a row from table based on description
 def removeRowFromDataframe(): ...
 
 
 def reset_button_click():
     del st.session_state.pieces
+    del st.session_state.hide_uploader
 
 @st.cache_data
 def convert_df(df):
@@ -70,6 +72,7 @@ if "max_length" not in st.session_state:
     st.session_state.max_length = 96
     st.session_state.old_value = st.session_state.max_length
 
+st.write(st.session_state)
 
 # Logo and Title
 _, col2, col3 = st.columns([1, 1, 3])
@@ -85,15 +88,15 @@ st.divider()
 # Sidebar
 with st.sidebar:
     if "pieces" not in st.session_state:
-        uploaded_file = st.file_uploader("Upload", type="csv")
-        if uploaded_file is not None:
+        uploaded_file = st.file_uploader("Upload", type="csv", key="file-uploaded")
+        if uploaded_file is not None and "reset-btn" not in st.session_state:
             st.session_state.pieces = pd.read_csv(uploaded_file)
     with st.container(border=True):
         st.title("Settings")
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
             with col1:
-                # TODO: Make kerf measurement work
+                # [ ]: Make kerf measurement work
                 kerf_toggle = st.toggle("Include Kerf")
             with col3:
                 update_button = st.form_submit_button("Update")
@@ -104,7 +107,7 @@ with st.sidebar:
                 step=12,
                 key="max_length",
             )
-            # TODO: add check to verify new length isn't shorter than longest piece
+            # [ ]: add check to verify new length isn't shorter than longest piece
             if update_button:
                 if st.session_state.max_length != st.session_state.old_value:
                     st.success(
@@ -148,14 +151,15 @@ with st.sidebar:
                 addRowToDataframe(user_input)
             else:
                 st.warning("Please fill in all fields.")
-            if "pieces" in st.session_state:
-                st.dataframe(st.session_state.pieces, hide_index=True)
+        if "pieces" in st.session_state:
+            st.dataframe(st.session_state.pieces, hide_index=True)
     if "pieces" in st.session_state:
-        #TODO: fix: reset button won't clear displayed dataframe on reset when only adding csv
-        reset_button = st.button("Restart Cut List", on_click=reset_button_click)
+        # [w]: fix: reset button won't clear displayed dataframe on reset when only adding csv
+        reset_button = st.button("Restart Cut List", on_click=reset_button_click, key="reset-btn")
         csv = convert_df(st.session_state.pieces)
         st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
 
+st.write(st.session_state)
 
 # Charts
 if "pieces" in st.session_state:
