@@ -17,7 +17,7 @@ def addRowToDataframe(user_input):
     st.success(f"Added {user_input["Description"][0]}")
 
 
-# TODO: add function to remove a row from table based on description
+# [ ]: add function to remove a row from table based on description
 def removeRowFromDataframe(): ...
 
 
@@ -93,7 +93,7 @@ with st.sidebar:
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
             with col1:
-                # TODO: Make kerf measurement work
+                # [ ]: Make kerf measurement work
                 kerf_toggle = st.toggle("Include Kerf")
             with col3:
                 update_button = st.form_submit_button("Update")
@@ -104,7 +104,7 @@ with st.sidebar:
                 step=12,
                 key="max_length",
             )
-            # TODO: add check to verify new length isn't shorter than longest piece
+            # [ ]: add check to verify new length isn't shorter than longest piece
             if update_button:
                 if st.session_state.max_length != st.session_state.old_value:
                     st.success(
@@ -151,7 +151,7 @@ with st.sidebar:
             if "pieces" in st.session_state:
                 st.dataframe(st.session_state.pieces, hide_index=True)
     if "pieces" in st.session_state:
-        #TODO: fix: reset button won't clear displayed dataframe on reset when only adding csv
+        # [ ]: fix: reset button won't clear displayed dataframe on reset when only adding csv
         reset_button = st.button("Restart Cut List", on_click=reset_button_click)
         csv = convert_df(st.session_state.pieces)
         st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
