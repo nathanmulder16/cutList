@@ -9,9 +9,6 @@ st.set_page_config(
 def updatePurchasedBoardLength():
     if "pieces" in st.session_state:
         st.session_state.min_purchased_length = int(st.session_state.pieces["Length"].max())
-    # else:
-    #     st.session_state.min_purchased_length = 12
-    #     st.session_state.prev_purchased_length = st.session_state.purchased_length
 
     if st.session_state.purchased_length >= st.session_state.min_purchased_length:
         if st.session_state.purchased_length != st.session_state.prev_purchased_length:
@@ -99,16 +96,6 @@ def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     return cut_list
 
 
-# if "purchased_length" not in st.session_state:
-#     st.session_state.purchased_length = 96
-#     st.session_state.prev_purchased_length = st.session_state.purchased_length
-
-st.divider()
-st.session_state
-st.divider()
-
-
-
 # Logo and Title
 _, col2, col3 = st.columns([1, 1, 3])
 with col2:
@@ -131,11 +118,6 @@ with st.sidebar:
         st.title("Settings")
 
 
-        # if "pieces" in st.session_state:
-        #     st.session_state.min_purchased_length = int(st.session_state.pieces["Length"].max())
-        # else:
-        #     st.session_state.min_purchased_length= 12
-        # st.write(st.session_state.min_purchased_length)
         if "min_purchased_length" not in st.session_state and "purchased_length" not in st.session_state:
             st.session_state.min_purchased_length = 12
             st.session_state.purchased_length = 96
@@ -157,7 +139,6 @@ with st.sidebar:
                 key="purchased_length",
                 value=st.session_state.purchased_length
             )
-            # [w]: add check to verify new length isn't shorter than longest piece
             if update_button:
                 if st.session_state.updatePurchasedBoardResult == "update":
                     st.success(f"Max length updated from {st.session_state.prev_purchased_length} to {st.session_state.purchased_length}.")
