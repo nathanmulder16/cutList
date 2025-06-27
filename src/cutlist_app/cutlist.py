@@ -11,14 +11,26 @@ def hideUploader():
     st.session_state.hide_uploader = True
 
 
-def addRowToDataframe(user_input):
-    if "pieces" not in st.session_state:
-        st.session_state.pieces = user_input
-    else:
-        st.session_state.pieces = pd.concat(
-            [st.session_state.pieces, user_input], ignore_index=True
+def addRowToDataframe():
+    if None not in [st.session_state.description_input, st.session_state.quantity_input, st.session_state.length_input, st.session_state.wxh_input]:
+        st.session_state.hide_uploader = True
+        user_input = pd.DataFrame(
+            {
+                "Description": [st.session_state.description_input],
+                "Quantity": [st.session_state.quantity_input],
+                "Length": [st.session_state.length_input],
+                "W x H": [st.session_state.wxh_input]
+            }
         )
-    st.success(f"Added {user_input["Description"][0]}")
+        if "pieces" not in st.session_state:
+            st.session_state.pieces = user_input
+        else:
+            st.session_state.pieces = pd.concat(
+                [st.session_state.pieces, user_input], ignore_index=True
+            )
+        st.session_state.addRowSuccessful = True
+    else:
+        st.session_state.addRowSuccessful = False
 
 
 # [ ]: add function to remove a row from table based on description
@@ -77,10 +89,6 @@ if "max_length" not in st.session_state:
     st.session_state.max_length = 96
     st.session_state.old_value = st.session_state.max_length
 
-st.divider()
-st.session_state
-st.divider()
-
 
 # Logo and Title
 _, col2, col3 = st.columns([1, 1, 3])
@@ -138,41 +146,34 @@ with st.sidebar:
         with st.form(key="user_input_form", clear_on_submit=True):
             col1, col2, col3 = st.columns(3)
             with col1:
-                description_input = st.text_input("Description:")
-                wxh_input = st.selectbox(
+                st.text_input("Description:", key="description_input", value=None)
+                st.selectbox(
                     "Width x Height:",
-                    ["1x2", "1x4", "2x2", "2x4", "2x6", "2x8", "2x12", "4x4"],
+                    ["1x2", "1x4", "2x2", "2x4", "2x6", "2x8", "2x12", "4x4"], key="wxh_input"
                 )
             with col2:
-                quantity_input = st.number_input(
-                    "Qty:", min_value=1, max_value=1000, value=None, step=1
+                st.number_input(
+                    "Qty:", min_value=1, max_value=1000, key="quantity_input", step=1, value=None
                 )
-                length_input = st.number_input(
+                st.number_input(
                     "Length (in):",
                     min_value=0.016,
                     max_value=float(st.session_state.max_length),
-                    value=None,
+                    key="length_input",
+                    value=None
                 )
             with col3:
                 for _ in range(7):
                     st.write("")
-                bom_add_button = st.form_submit_button("Add", on_click=hideUploader)
-            if bom_add_button and length_input and description_input and quantity_input:
-                user_input = pd.DataFrame(
-                    {
-                        "Description": [description_input],
-                        "Quantity": [quantity_input],
-                        "Length": [length_input],
-                        "W x H": [wxh_input],
-                    }
-                )
-                addRowToDataframe(user_input)
-            else:
-                st.warning("Please fill in all fields.")
+                add_button = st.form_submit_button("Add", on_click=addRowToDataframe)
+            if add_button:
+                if st.session_state.addRowSuccessful:
+                    st.success(f"Added {st.session_state.description_input}")
+                else:
+                    st.warning("Please fill in all fields.")
         if "pieces" in st.session_state:
             st.dataframe(st.session_state.pieces, hide_index=True)
     if "pieces" in st.session_state:
-        # [x]: fix: reset button won't clear displayed dataframe on reset when only adding csv
         reset_button = st.button(
             "Restart Cut List", on_click=reset_button_click, key="reset-btn"
         )
