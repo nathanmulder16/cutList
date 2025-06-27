@@ -122,6 +122,8 @@ with st.sidebar:
             st.session_state.min_purchased_length = 12
             st.session_state.purchased_length = 96
             st.session_state.prev_purchased_length = st.session_state.purchased_length
+        elif "pieces" in st.session_state:
+            st.session_state.min_purchased_length = int(st.session_state.pieces["Length"].max())
 
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
