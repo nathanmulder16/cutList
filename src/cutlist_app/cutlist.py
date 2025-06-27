@@ -9,9 +9,9 @@ st.set_page_config(
 def updatePurchasedBoardLength():
     if "pieces" in st.session_state:
         st.session_state.min_purchased_length = int(st.session_state.pieces["Length"].max())
-    else:
-        st.session_state.min_purchased_length = 12
-        st.session_state.prev_purchased_length = st.session_state.purchased_length
+    # else:
+    #     st.session_state.min_purchased_length = 12
+    #     st.session_state.prev_purchased_length = st.session_state.purchased_length
 
     if st.session_state.purchased_length >= st.session_state.min_purchased_length:
         if st.session_state.purchased_length != st.session_state.prev_purchased_length:
@@ -139,6 +139,7 @@ with st.sidebar:
         if "min_purchased_length" not in st.session_state and "purchased_length" not in st.session_state:
             st.session_state.min_purchased_length = 12
             st.session_state.purchased_length = 96
+            st.session_state.prev_purchased_length = st.session_state.purchased_length
 
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
