@@ -6,6 +6,20 @@ st.set_page_config(
     layout="wide", page_title="Cut List", page_icon=":material/carpenter:"
 )
 
+def updatePurchasedBoardLength():
+    if "pieces" in st.session_state:
+        st.session_state.min_purchased_length = int(st.session_state.pieces["Length"].max())
+    # else:
+    #     st.session_state.min_purchased_length = 12
+    #     st.session_state.prev_purchased_length = st.session_state.purchased_length
+
+    if st.session_state.purchased_length >= st.session_state.min_purchased_length:
+        if st.session_state.purchased_length != st.session_state.prev_purchased_length:
+            st.session_state.updatePurchasedBoardResult = "update"
+        else:
+            st.session_state.updatePurchasedBoardResult = "same"
+    else:
+        st.session_state.updatePurchasedBoardResult = "no update"
 
 def hideUploader():
     st.session_state.hide_uploader = True
@@ -85,9 +99,14 @@ def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     return cut_list
 
 
-if "max_length" not in st.session_state:
-    st.session_state.max_length = 96
-    st.session_state.old_value = st.session_state.max_length
+# if "purchased_length" not in st.session_state:
+#     st.session_state.purchased_length = 96
+#     st.session_state.prev_purchased_length = st.session_state.purchased_length
+
+st.divider()
+st.session_state
+st.divider()
+
 
 
 # Logo and Title
@@ -110,36 +129,43 @@ with st.sidebar:
             st.session_state.hide_uploader = True
     with st.container(border=True):
         st.title("Settings")
-        if "pieces" in st.session_state:
-            st.session_state.min_length = int(st.session_state.pieces["Length"].max())
-        else:
-            st.session_state.min_length = 12
-        st.write(st.session_state.min_length)
+
+
+        # if "pieces" in st.session_state:
+        #     st.session_state.min_purchased_length = int(st.session_state.pieces["Length"].max())
+        # else:
+        #     st.session_state.min_purchased_length= 12
+        # st.write(st.session_state.min_purchased_length)
+        if "min_purchased_length" not in st.session_state and "purchased_length" not in st.session_state:
+            st.session_state.min_purchased_length = 12
+            st.session_state.purchased_length = 96
+            st.session_state.prev_purchased_length = st.session_state.purchased_length
+
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
             with col1:
                 # [ ]: Make kerf measurement work
                 kerf_toggle = st.toggle("Include Kerf")
             with col3:
-                update_button = st.form_submit_button("Update")
-            max_length_input = st.number_input(
+                update_button = st.form_submit_button("Update", on_click=updatePurchasedBoardLength)
+            st.number_input(
                 "Purchased Board Length (in):",
-                min_value=12,
-                # min_value=st.session_state.min_length,
+                # min_value=12,
+                min_value=st.session_state.min_purchased_length,
                 max_value=144,
                 step=12,
-                key="max_length",
+                key="purchased_length",
+                value=st.session_state.purchased_length
             )
-            if max_length_input <= st.session_state.min_length:
-                st.warning(f"Board must be at least {st.session_state.min_length} inches.")
-            else:
-                # [w]: add check to verify new length isn't shorter than longest piece
-                if update_button:
-                    if st.session_state.max_length != st.session_state.old_value:
-                        st.success(
-                            f"Max length updated from {st.session_state.old_value} to {max_length_input}."
-                        )
-                        st.session_state.old_value = st.session_state.max_length
+            # [w]: add check to verify new length isn't shorter than longest piece
+            if update_button:
+                if st.session_state.updatePurchasedBoardResult == "update":
+                    st.success(f"Max length updated from {st.session_state.prev_purchased_length} to {st.session_state.purchased_length}.")
+                    st.session_state.prev_purchased_length = st.session_state.purchased_length
+                elif st.session_state.updatePurchasedBoardResult == "no update":
+                    st.warning(f"Board must be at least {st.session_state.min_purchased_length} inches.")
+                        
+
     with st.container(border=True):
         st.title("Bill of Materials")
         # Inputs
@@ -158,7 +184,7 @@ with st.sidebar:
                 st.number_input(
                     "Length (in):",
                     min_value=0.016,
-                    max_value=float(st.session_state.max_length),
+                    max_value=float(st.session_state.purchased_length),
                     key="length_input",
                     value=None
                 )
@@ -189,7 +215,7 @@ if "pieces" in st.session_state:
                 st.session_state.pieces["W x H"] == each_wxh
             ]
             cut_list_per_wxh = createCutList(
-                relevant_pieces_df, st.session_state.max_length
+                relevant_pieces_df, st.session_state.purchased_length
             )
             st.subheader(each_wxh)
             st.bar_chart(
