@@ -130,7 +130,7 @@ with st.sidebar:
                 step=12,
                 key="max_length",
             )
-            if max_length_input <= st.session_state.min_length:
+            if max_length_input < st.session_state.min_length:
                 st.warning(f"Board must be at least {st.session_state.min_length} inches.")
             else:
                 # [w]: add check to verify new length isn't shorter than longest piece
