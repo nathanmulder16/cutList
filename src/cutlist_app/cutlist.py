@@ -77,6 +77,10 @@ if "max_length" not in st.session_state:
     st.session_state.max_length = 96
     st.session_state.old_value = st.session_state.max_length
 
+st.divider()
+st.session_state
+st.divider()
+
 
 # Logo and Title
 _, col2, col3 = st.columns([1, 1, 3])
@@ -98,6 +102,11 @@ with st.sidebar:
             st.session_state.hide_uploader = True
     with st.container(border=True):
         st.title("Settings")
+        if "pieces" in st.session_state:
+            st.session_state.min_length = int(st.session_state.pieces["Length"].max())
+        else:
+            st.session_state.min_length = 12
+        st.write(st.session_state.min_length)
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
             with col1:
@@ -106,19 +115,23 @@ with st.sidebar:
             with col3:
                 update_button = st.form_submit_button("Update")
             max_length_input = st.number_input(
-                "Max Length (in):",
+                "Purchased Board Length (in):",
                 min_value=12,
+                # min_value=st.session_state.min_length,
                 max_value=144,
                 step=12,
                 key="max_length",
             )
-            # [ ]: add check to verify new length isn't shorter than longest piece
-            if update_button:
-                if st.session_state.max_length != st.session_state.old_value:
-                    st.success(
-                        f"Max length updated from {st.session_state.old_value} to {max_length_input}."
-                    )
-                    st.session_state.old_value = st.session_state.max_length
+            if max_length_input <= st.session_state.min_length:
+                st.warning(f"Board must be at least {st.session_state.min_length} inches.")
+            else:
+                # [w]: add check to verify new length isn't shorter than longest piece
+                if update_button:
+                    if st.session_state.max_length != st.session_state.old_value:
+                        st.success(
+                            f"Max length updated from {st.session_state.old_value} to {max_length_input}."
+                        )
+                        st.session_state.old_value = st.session_state.max_length
     with st.container(border=True):
         st.title("Bill of Materials")
         # Inputs
