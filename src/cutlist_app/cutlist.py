@@ -201,11 +201,14 @@ with st.sidebar:
         if "pieces" in st.session_state:
             st.dataframe(st.session_state.pieces, hide_index=True)
     if "pieces" in st.session_state:
-        reset_button = st.button(
-            "Restart Cut List", on_click=reset_button_click, key="reset-btn"
-        )
-        csv = convert_df(st.session_state.pieces)
-        st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
+        col1, col2 = st.columns(2)
+        with col1:
+            reset_button = st.button(
+                "Restart Cut List", on_click=reset_button_click, key="reset-btn"
+            )
+        with col2:
+            csv = convert_df(st.session_state.pieces)
+            st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
 
 
 # Charts
