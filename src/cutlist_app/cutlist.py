@@ -17,7 +17,7 @@ def updatePurchasedBoardLength():
         if st.session_state.purchased_length != st.session_state.prev_purchased_length:
             st.session_state.updatePurchasedBoardResult = True
 
-
+# [ ]: remove this as it is not called
 def hideUploader():
     st.session_state.hide_uploader = True
 
@@ -201,11 +201,14 @@ with st.sidebar:
         if "pieces" in st.session_state:
             st.dataframe(st.session_state.pieces, hide_index=True)
     if "pieces" in st.session_state:
-        reset_button = st.button(
-            "Restart Cut List", on_click=reset_button_click, key="reset-btn"
-        )
-        csv = convert_df(st.session_state.pieces)
-        st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
+        col1, col2 = st.columns(2)
+        with col1:
+            reset_button = st.button(
+                "Restart Cut List", on_click=reset_button_click, key="reset-btn"
+            )
+        with col2:
+            csv = convert_df(st.session_state.pieces)
+            st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
 
 
 # Charts
@@ -218,6 +221,34 @@ if "pieces" in st.session_state:
             cut_list_per_wxh = createCutList(
                 relevant_pieces_df, st.session_state.purchased_length
             )
+            
+            # Debugging
+            test_df = pd.DataFrame(
+                {
+                    "length": [60, 0.125, 30, 0.125, 60, 0.125, 30, 0.125, 60, 0.125],
+                    "board_id": [1, 1, 1, 1, 2, 2, 2, 2, 3, 3],
+                    "cut_id": ["60", "0.125", "30", "0.125", "60", "0.125", "30", "0.125", "60", "0.125"]
+                }
+            )
+            #[ ]: try altair?
+            #[ ]: just check length with kerf but don't plot it
+            st.bar_chart(
+                test_df,
+                x="board_id",
+                y="length",
+                color="cut_id",
+                horizontal=True,
+                x_label="Length (in)",
+                y_label="Board",
+                use_container_width=False,
+                width=1000,
+                height=400
+                )
+            
+
+            st.write(cut_list_per_wxh)
+            #
+            
             st.subheader(each_wxh)
             st.bar_chart(
                 cut_list_per_wxh,
