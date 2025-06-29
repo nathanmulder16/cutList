@@ -6,31 +6,36 @@ st.set_page_config(
     layout="wide", page_title="Cut List", page_icon=":material/carpenter:"
 )
 
+
 def updatePurchasedBoardLength():
     if "pieces" in st.session_state:
-        st.session_state.min_purchased_length = int(st.session_state.pieces["Length"].max())
+        st.session_state.min_purchased_length = int(
+            st.session_state.pieces["Length"].max()
+        )
 
     if st.session_state.purchased_length >= st.session_state.min_purchased_length:
         if st.session_state.purchased_length != st.session_state.prev_purchased_length:
-            st.session_state.updatePurchasedBoardResult = "update"
-        else:
-            st.session_state.updatePurchasedBoardResult = "same"
-    else:
-        st.session_state.updatePurchasedBoardResult = "no update"
+            st.session_state.updatePurchasedBoardResult = True
+
 
 def hideUploader():
     st.session_state.hide_uploader = True
 
 
 def addRowToDataframe():
-    if None not in [st.session_state.description_input, st.session_state.quantity_input, st.session_state.length_input, st.session_state.wxh_input]:
+    if None not in [
+        st.session_state.description_input,
+        st.session_state.quantity_input,
+        st.session_state.length_input,
+        st.session_state.wxh_input,
+    ]:
         st.session_state.hide_uploader = True
         user_input = pd.DataFrame(
             {
                 "Description": [st.session_state.description_input],
                 "Quantity": [st.session_state.quantity_input],
                 "Length": [st.session_state.length_input],
-                "W x H": [st.session_state.wxh_input]
+                "W x H": [st.session_state.wxh_input],
             }
         )
         if "pieces" not in st.session_state:
@@ -117,13 +122,17 @@ with st.sidebar:
     with st.container(border=True):
         st.title("Settings")
 
-
-        if "min_purchased_length" not in st.session_state and "purchased_length" not in st.session_state:
+        if (
+            "min_purchased_length" not in st.session_state
+            and "purchased_length" not in st.session_state
+        ):
             st.session_state.min_purchased_length = 12
             st.session_state.purchased_length = 96
             st.session_state.prev_purchased_length = st.session_state.purchased_length
         elif "pieces" in st.session_state:
-            st.session_state.min_purchased_length = int(st.session_state.pieces["Length"].max())
+            st.session_state.min_purchased_length = int(
+                st.session_state.pieces["Length"].max()
+            )
 
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
@@ -131,7 +140,9 @@ with st.sidebar:
                 # [ ]: Make kerf measurement work
                 kerf_toggle = st.toggle("Include Kerf")
             with col3:
-                update_button = st.form_submit_button("Update", on_click=updatePurchasedBoardLength)
+                update_button = st.form_submit_button(
+                    "Update", on_click=updatePurchasedBoardLength
+                )
             st.number_input(
                 "Purchased Board Length (in):",
                 # min_value=12,
@@ -139,15 +150,16 @@ with st.sidebar:
                 max_value=144,
                 step=12,
                 key="purchased_length",
-                value=st.session_state.purchased_length
+                value=st.session_state.purchased_length,
             )
             if update_button:
-                if st.session_state.updatePurchasedBoardResult == "update":
-                    st.success(f"Max length updated from {st.session_state.prev_purchased_length} to {st.session_state.purchased_length}.")
-                    st.session_state.prev_purchased_length = st.session_state.purchased_length
-                elif st.session_state.updatePurchasedBoardResult == "no update":
-                    st.warning(f"Board must be at least {st.session_state.min_purchased_length} inches.")
-                        
+                if st.session_state.updatePurchasedBoardResult:
+                    st.success(
+                        f"Max length updated from {st.session_state.prev_purchased_length} to {st.session_state.purchased_length}."
+                    )
+                    st.session_state.prev_purchased_length = (
+                        st.session_state.purchased_length
+                    )
 
     with st.container(border=True):
         st.title("Bill of Materials")
@@ -158,18 +170,24 @@ with st.sidebar:
                 st.text_input("Description:", key="description_input", value=None)
                 st.selectbox(
                     "Width x Height:",
-                    ["1x2", "1x4", "2x2", "2x4", "2x6", "2x8", "2x12", "4x4"], key="wxh_input"
+                    ["1x2", "1x4", "2x2", "2x4", "2x6", "2x8", "2x12", "4x4"],
+                    key="wxh_input",
                 )
             with col2:
                 st.number_input(
-                    "Qty:", min_value=1, max_value=1000, key="quantity_input", step=1, value=None
+                    "Qty:",
+                    min_value=1,
+                    max_value=1000,
+                    key="quantity_input",
+                    step=1,
+                    value=None,
                 )
                 st.number_input(
                     "Length (in):",
                     min_value=0.016,
                     max_value=float(st.session_state.purchased_length),
                     key="length_input",
-                    value=None
+                    value=None,
                 )
             with col3:
                 for _ in range(7):
