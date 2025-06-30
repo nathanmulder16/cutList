@@ -108,11 +108,6 @@ def addSomeNumbers(lst):
         ans += val
     return ans
 
-def subSomeNumbers(lst):
-    ans = 0
-    for val in lst:
-        ans -= val
-    return ans
 
 # Logo and Title
 _, col2, col3 = st.columns([1, 1, 3])

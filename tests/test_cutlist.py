@@ -2,7 +2,6 @@ import pytest
 import pandas as pd
 from cutlist_app.cutlist import (
     addSomeNumbers,
-    subSomeNumbers,
     createBoards,
     createCutList,
 )
@@ -28,10 +27,6 @@ def expected_cutlist():
 def test_addSomeNumbers(numbers):
     assert addSomeNumbers(numbers) == 6
     assert addSomeNumbers([2, 3, 4]) == 9
-
-
-def test_subSomeNumbers(numbers):
-    assert subSomeNumbers(numbers) == -6
 
 
 def test_createBoards(expected_cutlist):
