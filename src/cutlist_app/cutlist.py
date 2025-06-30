@@ -104,7 +104,7 @@ def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     return cut_list
 
 
-def create_stacked_chart(df):
+def create_stacked_chart(df, purchased_length):
     df["color"] = ""
     kerf_color = "#FB0D0D"
     color_options = [
@@ -159,6 +159,7 @@ def create_stacked_chart(df):
         )
         remember.add(cut)  # add current type to set
 
+    fig.add_vline(x=purchased_length, line_width=2, line_dash="dash", line_color="red", annotation_text=f"Board Length: {purchased_length}\"", annotation_position="top right", annotation_textangle=-90)
     fig.update_layout(
         xaxis={"categoryorder": "array", "categoryarray": []},
         # title={
@@ -322,7 +323,7 @@ if "pieces" in st.session_state:
             )
 
             st.subheader(each_wxh)
-            fig = create_stacked_chart(cut_list_per_wxh)
+            fig = create_stacked_chart(cut_list_per_wxh, st.session_state.purchased_length)
             st.plotly_chart(fig, on_select="ignore")
 else:
     _, col, _ = st.columns([2, 1, 2])
