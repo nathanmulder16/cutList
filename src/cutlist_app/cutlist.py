@@ -198,31 +198,6 @@ def addSomeNumbers(lst):
     return ans
 
 
-###################################################
-# Debugging
-test_df = pd.DataFrame(
-    {
-        "length": [60, 0.125, 30, 0.125, 60, 0.125, 30, 0.125, 60, 0.125],
-        "board_id": [1, 1, 1, 1, 2, 2, 2, 2, 3, 3],
-        "cut_id": [
-            "60",
-            "0.125",
-            "30",
-            "0.125",
-            "60",
-            "0.125",
-            "30",
-            "0.125",
-            "60",
-            "0.125",
-        ],
-    }
-)
-# Plotly Graph Object
-fig2 = create_stacked_chart(test_df)
-st.plotly_chart(fig2, on_select="ignore")
-###################################################
-
 # Logo and Title
 _, col2, col3 = st.columns([1, 1, 3])
 with col2:
@@ -347,19 +322,8 @@ if "pieces" in st.session_state:
             )
 
             st.subheader(each_wxh)
-            st.bar_chart(
-                cut_list_per_wxh,
-                x="board_id",
-                y="length",
-                color="cut_id",
-                horizontal=True,
-                x_label="Length (in)",
-                y_label="Board",
-                use_container_width=False,
-                width=1000,
-                height=400,
-            )
-
+            fig = create_stacked_chart(cut_list_per_wxh)
+            st.plotly_chart(fig, on_select="ignore")
 else:
     _, col, _ = st.columns([2, 1, 2])
     with col:
