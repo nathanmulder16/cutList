@@ -101,6 +101,19 @@ def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     return cut_list
 
 
+# for testing pytest setup
+def addSomeNumbers(lst):
+    ans = 0
+    for val in lst:
+        ans += val
+    return ans
+
+def subSomeNumbers(lst):
+    ans = 0
+    for val in lst:
+        ans -= val
+    return ans
+
 # Logo and Title
 _, col2, col3 = st.columns([1, 1, 3])
 with col2:
