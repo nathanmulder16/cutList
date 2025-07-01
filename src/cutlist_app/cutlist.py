@@ -1,5 +1,8 @@
 import pandas as pd
 import streamlit as st
+import plotly.graph_objects as go
+
+# import plotly.express as px
 import os
 
 st.set_page_config(
@@ -16,8 +19,11 @@ def updatePurchasedBoardLength():
     if st.session_state.purchased_length >= st.session_state.min_purchased_length:
         if st.session_state.purchased_length != st.session_state.prev_purchased_length:
             st.session_state.updatePurchasedBoardResult = True
+        else:
+            st.session_state.updatePurchasedBoardResult = False
 
 
+# [ ]: remove this as it is not called
 def hideUploader():
     st.session_state.hide_uploader = True
 
@@ -64,6 +70,7 @@ def convert_df(df):
 
 
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
+    kerf = 0.125
     remaining_board_length = MAX_BOARD_LENGTH
     boards = []
     board = []
@@ -74,16 +81,38 @@ def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
             remaining_board_length = MAX_BOARD_LENGTH
         else:
             for i in range(len(cut_list)):
-                if cut_list[i] <= remaining_board_length:
-                    remaining_board_length -= cut_list[i]
-                    board.append(cut_list.pop(i))
-                    break
+                # if kerf should be accounted for
+                if st.session_state.kerf_toggle:
+                    if (
+                        cut_list[i] <= remaining_board_length
+                        and cut_list[i] > remaining_board_length - kerf
+                    ):
+                        remaining_board_length = 0
+                        board.append(cut_list.pop(i))
+                        break
+                    elif cut_list[i] <= remaining_board_length - kerf:
+                        remaining_board_length = (
+                            remaining_board_length - cut_list[i] - kerf
+                        )
+                        board.append(cut_list.pop(i))
+                        board.append(kerf)
+                        break
+                # if kerf is not accounted for
+                else:
+                    if cut_list[i] <= remaining_board_length:
+                        remaining_board_length -= cut_list[i]
+                        board.append(cut_list.pop(i))
+                        break
     if len(board) > 0:
         boards.append(board)
     boards_df = pd.DataFrame(columns=["length", "board_id", "cut_id"])
     for board_id, board_list in enumerate(boards):
         for board_len in board_list:
-            boards_df.loc[len(boards_df)] = [board_len, board_id + 1, str(board_len)]
+            if board_len == kerf:
+                cut_id = "kerf"
+            else:
+                cut_id = str(board_len)
+            boards_df.loc[len(boards_df)] = [board_len, board_id + 1, cut_id]
     return boards_df
 
 
@@ -99,6 +128,92 @@ def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     cut_list.sort(reverse=True)
     cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
     return cut_list
+
+
+def create_stacked_chart(df, purchased_length):
+    df["color"] = ""
+    kerf_color = "#FB0D0D"
+    color_options = [
+        "#2E91E5",
+        "#E15F99",
+        "#1CA71C",
+        "#DA16FF",
+        "#222A2A",
+        "#B68100",
+        "#750D86",
+        "#EB663B",
+        "#511CFB",
+        "#00A08B",
+        "#FB00D1",
+        "#FC0080",
+        "#B2828D",
+        "#6C7C32",
+        "#778AAE",
+        "#862A16",
+        "#A777F1",
+        "#620042",
+        "#1616A7",
+        "#DA60CA",
+        "#6C4516",
+        "#0D2A63",
+        "#AF0038",
+    ]
+
+    unique_cuts = df["cut_id"].unique()
+    unique_color_counter = 0
+    for unique_cut in unique_cuts:
+        if unique_cut == "kerf":
+            df.loc[df["cut_id"] == unique_cut, "color"] = kerf_color
+        else:
+            unique_color = color_options[unique_color_counter]
+            df.loc[df["cut_id"] == unique_cut, "color"] = unique_color
+            unique_color_counter = (unique_color_counter + 1) % len(color_options)
+
+    # set for remembering types
+    remember = set()
+    fig = go.Figure()
+    for length, board, cut, color in zip(df.length, df.board_id, df.cut_id, df.color):
+        fig.add_bar(
+            x=[length],
+            y=[board],
+            marker_color=color,
+            orientation="h",
+            showlegend=cut not in remember,  # decide if trace is shown in legend
+            name=cut,
+            text=cut,
+            textposition="auto",
+        )
+        remember.add(cut)  # add current type to set
+
+    fig.add_vline(
+        x=purchased_length,
+        line_width=2,
+        line_dash="dash",
+        line_color="red",
+        annotation_text=f'Board Length: {purchased_length}"',
+        annotation_position="top right",
+        annotation_textangle=-90,
+    )
+    fig.update_layout(
+        xaxis={"categoryorder": "array", "categoryarray": []},
+        xaxis_title="Length (in)",
+        yaxis_title="Board #",
+        legend=dict(
+            title="Cut Length",
+            orientation="h",
+            yanchor="top",
+            y=1.2,
+            xanchor="left",
+            x=0,
+        ),
+        showlegend=True,
+    )
+    fig.update_traces(marker=dict(line=dict(width=1, color="black")))
+
+    # switch to stacked bar
+    fig.update_layout(barmode="stack")
+    # fig.show()
+    return fig
 
 
 # Logo and Title
@@ -137,8 +252,8 @@ with st.sidebar:
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
             with col1:
-                # [ ]: Make kerf measurement work
-                kerf_toggle = st.toggle("Include Kerf")
+                # [w]: Make kerf measurement work
+                kerf_toggle = st.toggle("Include Kerf", key="kerf_toggle")
             with col3:
                 update_button = st.form_submit_button(
                     "Update", on_click=updatePurchasedBoardLength
@@ -208,7 +323,9 @@ with st.sidebar:
             )
         with col2:
             csv = convert_df(st.session_state.pieces)
-            st.download_button("Export BOM", csv, "bom.csv", "text/csv", key="download-csv")
+            st.download_button(
+                "Export BOM", csv, "bom.csv", "text/csv", key="download-csv"
+            )
 
 
 # Charts
@@ -221,20 +338,12 @@ if "pieces" in st.session_state:
             cut_list_per_wxh = createCutList(
                 relevant_pieces_df, st.session_state.purchased_length
             )
-            st.subheader(each_wxh)
-            st.bar_chart(
-                cut_list_per_wxh,
-                x="board_id",
-                y="length",
-                color="cut_id",
-                horizontal=True,
-                x_label="Length (in)",
-                y_label="Board",
-                use_container_width=False,
-                width=1000,
-                height=400,
-            )
 
+            st.subheader(each_wxh)
+            fig = create_stacked_chart(
+                cut_list_per_wxh, st.session_state.purchased_length
+            )
+            st.plotly_chart(fig, on_select="ignore")
 else:
     _, col, _ = st.columns([2, 1, 2])
     with col:
