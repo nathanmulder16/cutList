@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
+
 # import plotly.express as px
 import os
 
@@ -82,12 +83,17 @@ def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
             for i in range(len(cut_list)):
                 # if kerf should be accounted for
                 if st.session_state.kerf_toggle:
-                    if cut_list[i] <= remaining_board_length and cut_list[i] > remaining_board_length - kerf:
+                    if (
+                        cut_list[i] <= remaining_board_length
+                        and cut_list[i] > remaining_board_length - kerf
+                    ):
                         remaining_board_length = 0
                         board.append(cut_list.pop(i))
                         break
                     elif cut_list[i] <= remaining_board_length - kerf:
-                        remaining_board_length = remaining_board_length - cut_list[i] - kerf
+                        remaining_board_length = (
+                            remaining_board_length - cut_list[i] - kerf
+                        )
                         board.append(cut_list.pop(i))
                         board.append(kerf)
                         break
@@ -109,26 +115,6 @@ def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
             boards_df.loc[len(boards_df)] = [board_len, board_id + 1, cut_id]
     return boards_df
 
-def createBoardsWithKerf(cut_list, MAX_BOARD_LENGTH):
-    remaining_board_length = MAX_BOARD_LENGTH
-    boards = []
-    board = []
-    
-    cut_list_with_kerf = []
-    for cut in cut_list:
-        cut_list_with_kerf.append(cut)
-        cut_list_with_kerf.append(0.125)
-    
-    while len(cut_list_with_kerf) > 0:
-        if min(cut_list) > remaining_board_length:
-            boards.append(board)
-            board = []
-            remaining_board_length = MAX_BOARD_LENGTH
-        else:
-            for i in range(len(cut_list_with_kerf)):
-                ...
-
-        
 
 def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     quantity_list = list(df["Quantity"])
@@ -202,16 +188,17 @@ def create_stacked_chart(df, purchased_length):
         )
         remember.add(cut)  # add current type to set
 
-    fig.add_vline(x=purchased_length, line_width=2, line_dash="dash", line_color="red", annotation_text=f"Board Length: {purchased_length}\"", annotation_position="top right", annotation_textangle=-90)
+    fig.add_vline(
+        x=purchased_length,
+        line_width=2,
+        line_dash="dash",
+        line_color="red",
+        annotation_text=f'Board Length: {purchased_length}"',
+        annotation_position="top right",
+        annotation_textangle=-90,
+    )
     fig.update_layout(
         xaxis={"categoryorder": "array", "categoryarray": []},
-        # title={
-        #     "text": f"<b>{project_title}</b>",
-        #     "y": 0.97,
-        #     "x": 0.5,
-        #     "xanchor": "center",
-        #     "yanchor": "top",
-        # },
         xaxis_title="Length (in)",
         yaxis_title="Board #",
         legend=dict(
@@ -223,8 +210,6 @@ def create_stacked_chart(df, purchased_length):
             x=0,
         ),
         showlegend=True,
-        # width=1200,
-        # height=250,
     )
     fig.update_traces(marker=dict(line=dict(width=1, color="black")))
 
@@ -232,14 +217,6 @@ def create_stacked_chart(df, purchased_length):
     fig.update_layout(barmode="stack")
     # fig.show()
     return fig
-
-
-# for testing pytest setup
-def addSomeNumbers(lst):
-    ans = 0
-    for val in lst:
-        ans += val
-    return ans
 
 
 # Logo and Title
@@ -366,7 +343,9 @@ if "pieces" in st.session_state:
             )
 
             st.subheader(each_wxh)
-            fig = create_stacked_chart(cut_list_per_wxh, st.session_state.purchased_length)
+            fig = create_stacked_chart(
+                cut_list_per_wxh, st.session_state.purchased_length
+            )
             st.plotly_chart(fig, on_select="ignore")
 else:
     _, col, _ = st.columns([2, 1, 2])
