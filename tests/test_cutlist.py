@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
+import streamlit as st
 from cutlist_app.cutlist import (
-    addSomeNumbers,
     createBoards,
     createCutList,
 )
@@ -24,18 +24,30 @@ def expected_cutlist():
     )
 
 
-def test_addSomeNumbers(numbers):
-    assert addSomeNumbers(numbers) == 6
-    assert addSomeNumbers([2, 3, 4]) == 9
-
-
 def test_createBoards(expected_cutlist):
+    st.session_state.kerf_toggle = False
     cut_list = [60.0, 60.0, 60.0, 45.0, 45.0, 15.0, 15.0]
     result_df = createBoards(cut_list, 96)
     pd.testing.assert_frame_equal(result_df, expected_cutlist)
 
 
+def test_createBoards_1():
+    st.session_state.kerf_toggle = True
+    cut_list = [60.0, 36.0]
+    purchased_length = 96
+    result_df = createBoards(cut_list, purchased_length)
+    expected_cutlist = pd.DataFrame(
+        {
+            "length": [60.0, 0.125, 36.0, 0.125],
+            "board_id": [1, 1, 2, 2],
+            "cut_id": ["60.0", "kerf", "36.0", "kerf"],
+        }
+    )
+    pd.testing.assert_frame_equal(result_df, expected_cutlist)
+
+
 def test_createCutList(expected_cutlist):
+    st.session_state.kerf_toggle = False
     df = pd.DataFrame(
         {
             "Description": ["example1", "example2", "example3"],
