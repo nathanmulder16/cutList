@@ -126,10 +126,7 @@ def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
         for _ in range(quantity):
             cut_list.append(length)
     cut_list.sort(reverse=True)
-    if not st.session_state.kerf_toggle:
-        cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
-    else:
-        cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
+    cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
     return cut_list
 
 
