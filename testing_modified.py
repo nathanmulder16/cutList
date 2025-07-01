@@ -2,13 +2,11 @@ import pandas as pd
 import plotly.graph_objects as go
 
 
-def create_stacked_chart(x_data, y_data, z_data, project_title):
-
-    data = {"length": y_data, "board_id": x_data, "cut_id": z_data, "color": ""}
-    df = pd.DataFrame(data)
-
+def create_stacked_chart(df, project_title):
+    # data = {"length": y_data, "board_id": x_data, "cut_id": z_data, "color": ""}
+    # df = pd.DataFrame(data)
+    df["color"] = ""
     kerf_color = "#FB0D0D"
-
     color_options = [
         "#2E91E5",
         "#E15F99",
@@ -48,10 +46,10 @@ def create_stacked_chart(x_data, y_data, z_data, project_title):
     # set for remembering types
     remember = set()
     fig = go.Figure()
-    for length, text, cut, color in zip(df.length, df.board_id, df.cut_id, df.color):
+    for length, board, cut, color in zip(df.length, df.board_id, df.cut_id, df.color):
         fig.add_bar(
             x=[length],
-            y=[text],
+            y=[board],
             marker_color=color,
             orientation="h",
             showlegend=cut not in remember,  # decide if trace is shown in legend
@@ -89,11 +87,24 @@ def create_stacked_chart(x_data, y_data, z_data, project_title):
     # switch to stacked bar
     fig.update_layout(barmode="stack")
     fig.show()
+    return fig
 
-
-# x_data = [random.choice([*color_map.keys()]) for _ in range(40)]
-y_data = [60.0, 15.0, 0.125, 15.0, 60.0, 60.0, 45.0, 45.0]
-# y_data = [random.random() for _ in range(40)]
-x_data = [1, 1, 1, 1, 2, 3, 4, 4]
-z_data = ["60.0", "15.0", "kerf", "15.0", "60.0", "60.0", "45.0", "45.0"]
-fig = create_stacked_chart(x_data, y_data, z_data, "2x4")
+test_df = pd.DataFrame(
+    {
+        "length": [60, 0.125, 30, 0.125, 60, 0.125, 30, 0.125, 60, 0.125],
+        "board_id": [1, 1, 1, 1, 2, 2, 2, 2, 3, 3],
+        "cut_id": [
+            "60",
+            "0.125",
+            "30",
+            "0.125",
+            "60",
+            "0.125",
+            "30",
+            "0.125",
+            "60",
+            "0.125",
+        ],
+    }
+)
+fig = create_stacked_chart(test_df, "2x4")
