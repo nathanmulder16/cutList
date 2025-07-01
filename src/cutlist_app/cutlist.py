@@ -18,6 +18,8 @@ def updatePurchasedBoardLength():
     if st.session_state.purchased_length >= st.session_state.min_purchased_length:
         if st.session_state.purchased_length != st.session_state.prev_purchased_length:
             st.session_state.updatePurchasedBoardResult = True
+        else:
+            st.session_state.updatePurchasedBoardResult = False
 
 
 # [ ]: remove this as it is not called
@@ -67,6 +69,7 @@ def convert_df(df):
 
 
 def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
+    kerf = 0.125
     remaining_board_length = MAX_BOARD_LENGTH
     boards = []
     board = []
@@ -77,18 +80,55 @@ def createBoards(cut_list, MAX_BOARD_LENGTH) -> pd.DataFrame:
             remaining_board_length = MAX_BOARD_LENGTH
         else:
             for i in range(len(cut_list)):
-                if cut_list[i] <= remaining_board_length:
-                    remaining_board_length -= cut_list[i]
-                    board.append(cut_list.pop(i))
-                    break
+                # if kerf should be accounted for
+                if st.session_state.kerf_toggle:
+                    if cut_list[i] <= remaining_board_length and cut_list[i] > remaining_board_length - kerf:
+                        remaining_board_length = 0
+                        board.append(cut_list.pop(i))
+                        break
+                    elif cut_list[i] <= remaining_board_length - kerf:
+                        remaining_board_length = remaining_board_length - cut_list[i] - kerf
+                        board.append(cut_list.pop(i))
+                        board.append(kerf)
+                        break
+                # if kerf is not accounted for
+                else:
+                    if cut_list[i] <= remaining_board_length:
+                        remaining_board_length -= cut_list[i]
+                        board.append(cut_list.pop(i))
+                        break
     if len(board) > 0:
         boards.append(board)
     boards_df = pd.DataFrame(columns=["length", "board_id", "cut_id"])
     for board_id, board_list in enumerate(boards):
         for board_len in board_list:
-            boards_df.loc[len(boards_df)] = [board_len, board_id + 1, str(board_len)]
+            if board_len == kerf:
+                cut_id = "kerf"
+            else:
+                cut_id = str(board_len)
+            boards_df.loc[len(boards_df)] = [board_len, board_id + 1, cut_id]
     return boards_df
 
+def createBoardsWithKerf(cut_list, MAX_BOARD_LENGTH):
+    remaining_board_length = MAX_BOARD_LENGTH
+    boards = []
+    board = []
+    
+    cut_list_with_kerf = []
+    for cut in cut_list:
+        cut_list_with_kerf.append(cut)
+        cut_list_with_kerf.append(0.125)
+    
+    while len(cut_list_with_kerf) > 0:
+        if min(cut_list) > remaining_board_length:
+            boards.append(board)
+            board = []
+            remaining_board_length = MAX_BOARD_LENGTH
+        else:
+            for i in range(len(cut_list_with_kerf)):
+                ...
+
+        
 
 def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
     quantity_list = list(df["Quantity"])
@@ -100,7 +140,10 @@ def createCutList(df, MAX_BOARD_LENGTH) -> pd.DataFrame:
         for _ in range(quantity):
             cut_list.append(length)
     cut_list.sort(reverse=True)
-    cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
+    if not st.session_state.kerf_toggle:
+        cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
+    else:
+        cut_list = createBoards(cut_list, MAX_BOARD_LENGTH)
     return cut_list
 
 
@@ -235,8 +278,8 @@ with st.sidebar:
         with st.form("settings_form"):
             col1, _, col3 = st.columns([0.4, 0.35, 0.25])
             with col1:
-                # [ ]: Make kerf measurement work
-                kerf_toggle = st.toggle("Include Kerf")
+                # [w]: Make kerf measurement work
+                kerf_toggle = st.toggle("Include Kerf", key="kerf_toggle")
             with col3:
                 update_button = st.form_submit_button(
                     "Update", on_click=updatePurchasedBoardLength
